@@ -130,8 +130,8 @@ class HBNBCommand(cmd.Cmd):
             key, value = arg.split('=')
             if value.startswith('"') and value.endswith('"'):
                 value = value[1:-1]
-                value.replace('_', ' ')
-                value.replace('\"', '"')
+                value = value.replace('_', ' ')
+                value = value.replace('\"', '"')
 
             elif '.' in value:
                 try:
