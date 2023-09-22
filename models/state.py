@@ -12,12 +12,13 @@ class State(BaseModel, Base):
     """ State class """
     __tablename__ = "states"
     name = Column(String(128), nullable=False)
-    cities = relationship('City', cascade='all, delete-orphan', backref='state')
+    cities = relationship(
+            'City', cascade='all, delete-orphan', backref='state')
 
     @property
     def cities(self):
         """
-        Returns list of City instances with state_id equals to the current State.id
+        Returns City instances with state_id equals to the current State.id
         """
         from models import storage
         my_list = []
