@@ -5,6 +5,7 @@ from sqlalchemy import Column, String, Float, Integer
 from sqlalchemy import ForeignKey, Table
 from sqlalchemy.orm import relationship
 from os import getenv
+import models
 
 
 place_amenity = Table(
@@ -37,8 +38,6 @@ class Place(BaseModel, Base):
                 'Amenity', secondary='place_amenity', viewonly=False)
 
     else:
-        from models import storage
-
         @property
         def reviews(self):
             """
@@ -46,7 +45,7 @@ class Place(BaseModel, Base):
             to the current Place.id
             """
             objs = []
-            instances = storage.all("Review")
+            instances = models.storage.all("Review")
             for value in instances.values():
                 if value.place_id == Place.id:
                     objs.append(value)
@@ -59,7 +58,7 @@ class Place(BaseModel, Base):
             amenity_ids
             """
             objs = []
-            instances = storage.all("Amenity")
+            instances = models.storage.all("Amenity")
             for value in instances.values():
                 if value.id in self.amenity_ids:
                     objs.append(value)
