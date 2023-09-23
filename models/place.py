@@ -1,9 +1,18 @@
 #!/usr/bin/python3
 """ Place Module for HBNB project """
 from models.base_model import BaseModel, Base
-from sqlalchemy import Column, String, Float, Integer, Table, ForeignKey
+from sqlalchemy import Column, String, Float, Integer
+from sqlalchemy import primary_key, ForeignKey, Table
 from sqlalchemy.orm import relationship
 from os import getenv
+
+
+place_amenity = Table(
+        'place_amenity', Base.metadata,
+        Column('place_id', String(60), ForeignKey('places.id'),
+                primary_key=True, nullable=False),
+        Column('amenity_id', String(60), ForeignKey('amenities.id'),
+                primary_key=True, nullable=False))
 
 
 class Place(BaseModel, Base):
@@ -24,14 +33,43 @@ class Place(BaseModel, Base):
     if getenv("HBNB_TYPE_STORAGE") == "db":
         reviews = relationship(
                 'Review', cascade='all, delete-orphan', backref='place')
+        amenities = relationship(
+                'Amenity', secondary='place_amenity', viewonly=False)
 
     else:
+        from models import storage
+
         @property
         def reviews(self):
-            from models import storage
+            """
+            returns the list of Review instances with place_id equals
+            to the current Place.id
+            """
             objs = []
             instances = storage.all("Review")
             for value in instances.values():
                 if value.place_id == Place.id:
                     objs.append(value)
             return objs
+
+        @property
+        def amenities(self):
+            """
+            Returns the list of Amenity instances based on the attribute
+            amenity_ids
+            """
+            objs = []
+            instances = storage.all("Amenity")
+            for value in instances.values():
+                if value.id in self.amenity_ids:
+                    objs.append(value)
+            return objs
+
+        @amenities.setter
+        def amenities(self, obj):
+            """
+            Adds an Amenity.id to the attribute amenity_ids list
+            """
+            from models.amenity import Amenity
+            if isinstance(obj, Amenity):
+                self.amenity_ids.append(obj.id)
