@@ -46,6 +46,7 @@ def num(n):
     """Display “n is a number” only if n is an integer"""
     return "{} is a number".format(n)
 
+
 # Define the route for URL /number_template/<n>
 @app.route('/number_template/<int:n>', strict_slashes=False)
 def num_template(n):
